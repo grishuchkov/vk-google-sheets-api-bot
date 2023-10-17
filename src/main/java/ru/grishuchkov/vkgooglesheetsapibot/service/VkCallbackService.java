@@ -25,7 +25,6 @@ public class VkCallbackService implements CallbackService {
     public void handle(JsonNode json) {
         if (json.get("type").asText().equals("message_new")) {
             processMessage(json);
-            return;
         }
     }
 
@@ -46,7 +45,7 @@ public class VkCallbackService implements CallbackService {
         String userId = messageRequest.getUserId();
 
         if (messageText.equalsIgnoreCase(messagesResource.getString(conditionTextKey))) {
-            vkApiClient.sendMessage(userId, messagesResource.getString(messageTextKey));
+            vkApiClient.sendMessage(userId, messagesResource.getString(messageTextKey), null);
         }
     }
 }
