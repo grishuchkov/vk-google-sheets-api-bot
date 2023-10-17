@@ -28,7 +28,8 @@ public class VkCallbackController {
         String type = callbackJson.get("type").asText();
 
         if (type.equals(CallbackType.CONFIRMATION.getType())) {
-            return new ResponseEntity<>("0000000", HttpStatusCode.valueOf(200));
+            String confirmationCode = callbackService.getConfirmationCode(callbackJson);
+            return new ResponseEntity<>(confirmationCode, HttpStatusCode.valueOf(200));
         }
 
         executor.execute(() -> callbackService.handle(callbackJson));

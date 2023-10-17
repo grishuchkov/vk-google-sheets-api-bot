@@ -1,5 +1,6 @@
 package ru.grishuchkov.vkgooglesheetsapibot.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Objects;
 import java.util.Random;
 
 @Service
@@ -40,6 +42,21 @@ public class VkApiClient {
         ResponseEntity<String> response = restTemplate.postForEntity(sendMessageUri,
                 new HttpEntity<>(null), String.class);
     }
+
+    public String getConfirmationCode(String groupId){
+
+        URI getConfirmationCodeUri = getPreparedBaseUrlComponent().
+                queryParam("group_id", groupId)
+                .buildAndExpand("groups.getCallbackConfirmationCode")
+                .toUri();
+
+        ResponseEntity<JsonNode> response = restTemplate.postForEntity(getConfirmationCodeUri,
+                new HttpEntity<>(null), JsonNode.class);
+
+        return Objects.requireNonNull(response.getBody()).get("response").get("code").asText();
+    }
+
+
 
     private UriComponentsBuilder getPreparedBaseUrlComponent() {
         int randomId = random.nextInt();

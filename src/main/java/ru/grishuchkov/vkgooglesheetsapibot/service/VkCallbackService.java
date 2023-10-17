@@ -1,7 +1,6 @@
 package ru.grishuchkov.vkgooglesheetsapibot.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import ru.grishuchkov.vkgooglesheetsapibot.client.VkApiClient;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.NewMessageRequest;
@@ -18,12 +17,17 @@ public class VkCallbackService implements CallbackService {
     }
 
     @Override
-    @SneakyThrows
     public void handle(JsonNode json) {
         NewMessageRequest newMessageRequest = mapper.mapMessageNew(json);
 
-
         vkApiClient.sendMessage(newMessageRequest.getUserId(), newMessageRequest.getMessageText());
+    }
 
+    @Override
+    public String getConfirmationCode(JsonNode json) {
+        String groupId = json.get("group_id").asText();
+        String confirmationCode = vkApiClient.getConfirmationCode(groupId);
+
+        return confirmationCode;
     }
 }
