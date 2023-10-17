@@ -37,7 +37,10 @@ public class VkApiClient {
     public void sendMessage(String userId, String text, String keyboard) {
         SendMessageBuilder messageBuilder = new SendMessageBuilder(userId, text);
         messageBuilder.withKeyboard(keyboard);
-        URI sendMessageUri = messageBuilder.returnUri(getPreparedBaseUrlComponent());
+        URI sendMessageUri = messageBuilder
+                                .returnUri(getPreparedBaseUrlComponent())
+                                .build()
+                                .toUri();
 
         ResponseEntity<String> response = restTemplate.postForEntity(sendMessageUri,
                 new HttpEntity<>(null), String.class);
@@ -59,8 +62,7 @@ public class VkApiClient {
     private UriComponentsBuilder getPreparedBaseUrlComponent() {
         int randomId = random.nextInt();
 
-        return UriComponentsBuilder.fromHttpUrl(vkApiUrl)
-                .path("{method}")
+        return UriComponentsBuilder.fromHttpUrl(vkApiUrl + "messages.send")
                 .queryParam("v", apiVersion)
                 .queryParam("random_id", randomId)
                 .queryParam("access_token", token);

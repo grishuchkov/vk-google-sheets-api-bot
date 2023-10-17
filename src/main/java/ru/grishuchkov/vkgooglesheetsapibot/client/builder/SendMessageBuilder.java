@@ -2,8 +2,6 @@ package ru.grishuchkov.vkgooglesheetsapibot.client.builder;
 
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
-
 public class SendMessageBuilder {
 
     private String userId;
@@ -20,7 +18,7 @@ public class SendMessageBuilder {
         return this;
     }
 
-    public URI returnUri(UriComponentsBuilder baseUri) {
+    public UriComponentsBuilder returnUri(UriComponentsBuilder baseUri) {
         if (keyboard == null) {
             keyboard = "";
         }
@@ -28,8 +26,6 @@ public class SendMessageBuilder {
         return baseUri
                 .queryParam("message", message)
                 .queryParam("user_id", userId)
-                .queryParam("keyboard", keyboard)
-                .buildAndExpand("messages.send")
-                .toUri();
+                .queryParam("keyboard", keyboard);
     }
 }
