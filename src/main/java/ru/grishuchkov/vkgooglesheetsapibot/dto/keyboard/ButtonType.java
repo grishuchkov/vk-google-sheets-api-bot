@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public enum ButtonType {
 
-    TEXT("text"),
-    CALLBACK("callback");
+    text("text"),
+    callback("callback");
 
     private final String type;
     ButtonType(String type) {
