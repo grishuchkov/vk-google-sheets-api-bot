@@ -3,13 +3,13 @@ package ru.grishuchkov.vkgooglesheetsapibot.utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Component;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.BaseRequest;
-import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.NewMessageRequest;
+import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageRequest;
 
 @Component
 public class CallbackRequestMapper {
 
-    public NewMessageRequest mapMessageNew(JsonNode json){
-        NewMessageRequest request = new NewMessageRequest();
+    public MessageRequest mapMessageNew(JsonNode json){
+        MessageRequest request = new MessageRequest();
         setDefaultFields(request, json);
 
         JsonNode messageNode = json.get("object").get("message");

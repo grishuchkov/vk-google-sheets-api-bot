@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NewMessageRequest extends BaseRequest {
+public class MessageRequest extends BaseRequest {
     private String messageText;
 }

@@ -37,6 +37,7 @@ public class VkApiClient {
         URI sendMessageUri = getPreparedBaseUrlComponent()
                 .queryParam("message", text)
                 .queryParam("user_id", userId)
+                .queryParam("keyboard", "")
                 .buildAndExpand("messages.send").toUri();
 
         ResponseEntity<String> response = restTemplate.postForEntity(sendMessageUri,
