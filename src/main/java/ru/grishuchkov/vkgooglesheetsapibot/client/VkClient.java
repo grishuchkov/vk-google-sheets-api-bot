@@ -25,13 +25,13 @@ public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.VkAp
 
     @Override
     @SneakyThrows
-    public void sendMessage(Integer groupId, String text, Integer userId) {
-        sendMessage(groupId, text, userId, null);
+    public void sendMessage(Integer groupId, Integer userId, String text) {
+        sendMessage(groupId, userId, text, null);
     }
 
     @Override
     @SneakyThrows
-    public void sendMessage(Integer groupId, String text, Integer userId, Keyboard keyboard){
+    public void sendMessage(Integer groupId, Integer userId, String text, Keyboard keyboard){
         Keyboard keyboardObject = new Keyboard();
         if(keyboard != null){
             keyboardObject = keyboard;
@@ -53,5 +53,14 @@ public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.VkAp
                 .getCallbackConfirmationCode(new GroupActor(groupId, token), groupId).execute();
 
         return response.getCode();
+    }
+
+    @Override
+    @SneakyThrows
+    public void sendMessageEventAnswer(Integer groupId, Integer userId, Integer peerId, String eventId) {
+        vk.messages()
+                .sendMessageEventAnswer(new GroupActor(groupId, token), eventId, userId, peerId)
+                .eventData("{\"message\": \"Ghbdtn\"}")
+                .execute();
     }
 }
