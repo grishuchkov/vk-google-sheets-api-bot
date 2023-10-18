@@ -25,7 +25,7 @@ public class KeyboardUtil {
             for (int j = 0; j < columns && numberOfWork <= num; j++) {
                 KeyboardButton button = new KeyboardButton()
                         .setAction(new KeyboardButtonAction()
-                                .setLabel("Сдать ДЗ " + numberOfWork)
+                                .setLabel("Сдать ДЗ №" + numberOfWork)
                                 .setPayload("{\"button\": \"" + numberOfWork + "\"}")
                                 .setType(TemplateActionTypeNames.TEXT));
                 button.setColor(KeyboardButtonColor.POSITIVE);

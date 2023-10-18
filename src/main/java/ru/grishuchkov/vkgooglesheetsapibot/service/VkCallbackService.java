@@ -47,15 +47,15 @@ public class VkCallbackService implements CallbackService {
         int userId = request.getUserId();
         int groupId = request.getGroupId();
 
-        if (isMessageCommand(messageText, "homework_command")) {
+        if(isSubmitHomeworkMessage(messageText, "submit_homework_command")){
             vkClient.sendMessage(groupId, userId, messagesResource.getString("homework_received"));
         }
+
         if (isMessageCommand(messageText, "homework_keyboard_command")) {
             Keyboard homeworkKeyboard = keyboardUtil.getHomeworkKeyboard();
 
             vkClient.sendMessage(groupId, userId, messagesResource.getString("homework_keyboard_received"), homeworkKeyboard);
         }
-
     }
 
     private void processMessageEvent(JsonNode jsonNode) {
@@ -71,5 +71,9 @@ public class VkCallbackService implements CallbackService {
 
     private boolean isMessageCommand(String messageText, String command) {
         return messageText.equalsIgnoreCase(messagesResource.getString(command));
+    }
+
+    private boolean isSubmitHomeworkMessage(String messageText, String submitHomeworkCommand){
+       return messageText.regionMatches(true, 0,  messagesResource.getString(submitHomeworkCommand), 0, 10);
     }
 }
