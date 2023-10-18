@@ -3,6 +3,7 @@ package ru.grishuchkov.vkgooglesheetsapibot.utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Component;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.BaseRequest;
+import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageEventRequest;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageRequest;
 
 @Component
@@ -15,6 +16,18 @@ public class CallbackRequestMapper {
         JsonNode messageNode = json.get("object").get("message");
         request.setUserId(messageNode.get("from_id").asInt());
         request.setMessageText(messageNode.get("text").asText());
+
+        return request;
+    }
+
+    public MessageEventRequest mapMessageEvent(JsonNode json){
+        MessageEventRequest request = new MessageEventRequest();
+        setDefaultFields(request, json);
+
+        JsonNode objectNode = json.get("object");
+        request.setUserId(objectNode.get("user_id").asInt());
+        request.setPeerId(objectNode.get("peer_id").asInt());
+        request.setObjectEventId(objectNode.get("event_id").asText());
 
         return request;
     }
