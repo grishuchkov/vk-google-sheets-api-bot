@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class BaseRequest {
-    private long groupId;
+    private int groupId;
+    private int userId;
     private String requestType;
     private String eventId;
     private String apiVersion;
-    private String userId;
 }

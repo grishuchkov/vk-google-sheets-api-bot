@@ -13,14 +13,14 @@ public class CallbackRequestMapper {
         setDefaultFields(request, json);
 
         JsonNode messageNode = json.get("object").get("message");
-        request.setUserId(messageNode.get("from_id").asText());
+        request.setUserId(messageNode.get("from_id").asInt());
         request.setMessageText(messageNode.get("text").asText());
 
         return request;
     }
 
     private void setDefaultFields(BaseRequest baseRequest, JsonNode json){
-        baseRequest.setGroupId(json.get("group_id").asLong());
+        baseRequest.setGroupId(json.get("group_id").asInt());
         baseRequest.setRequestType(json.get("type").asText());
         baseRequest.setEventId(json.get("event_id").asText());
         baseRequest.setApiVersion(json.get("v").asText());

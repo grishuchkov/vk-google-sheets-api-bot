@@ -1,45 +1,36 @@
 package ru.grishuchkov.vkgooglesheetsapibot.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import ru.grishuchkov.vkgooglesheetsapibot.client.VkApiClient;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageRequest;
-import ru.grishuchkov.vkgooglesheetsapibot.dto.keyboard.Keyboard;
 import ru.grishuchkov.vkgooglesheetsapibot.utils.CallbackRequestMapper;
-import ru.grishuchkov.vkgooglesheetsapibot.utils.KeyboardUtils;
 
 import java.util.ResourceBundle;
 
 @Service
+@RequiredArgsConstructor
 public class VkCallbackService implements CallbackService {
 
     private final CallbackRequestMapper callbackRequestMapper;
     private final ResourceBundle messagesResource;
-    private final VkApiClient vkApiClient;
+    private final VkApiClient vkClient;
+    @Override
+    public String getConfirmationCode(JsonNode json) {
+        int groupId = json.get("group_id").asInt();
 
-    private final KeyboardUtils keyboardUtils;
-
-    public VkCallbackService(CallbackRequestMapper callbackRequestMapper, ResourceBundle messagesResource, VkApiClient vkApiClient, KeyboardUtils keyboardUtils) {
-        this.callbackRequestMapper = callbackRequestMapper;
-        this.messagesResource = messagesResource;
-        this.vkApiClient = vkApiClient;
-        this.keyboardUtils = keyboardUtils;
+        return vkClient.getConfirmationCode(groupId);
     }
 
     @Override
     public void handle(JsonNode json) {
-        if (json.get("type").asText().equals("message_new")) {
+        String typeOfRequest = json.get("type").asText();
+
+        if (typeOfRequest.equals("message_new")) {
             processMessage(json);
         }
-    }
-
-    @Override
-    public String getConfirmationCode(JsonNode json) {
-        String groupId = json.get("group_id").asText();
-
-        return vkApiClient.getConfirmationCode(groupId);
     }
 
     @SneakyThrows
@@ -47,20 +38,15 @@ public class VkCallbackService implements CallbackService {
         MessageRequest request = callbackRequestMapper.mapMessageNew(json);
 
         String messageText = request.getMessageText();
-        String userId = request.getUserId();
+        int userId = request.getUserId();
+        int groupId = request.getGroupId();
 
-        if (messageText.equalsIgnoreCase(messagesResource.getString("homework_command"))) {
-            vkApiClient.sendMessage(userId, messagesResource.getString("homework_received"), null);
+        if (isCommand(messageText, "homework_keyboard_command")) {
+            vkClient.sendMessage(groupId, messagesResource.getString("homework_received"), userId);
         }
-
-        if (messageText.equalsIgnoreCase(messagesResource.getString("keyboard_command"))) {
-            Keyboard keyboardObject = keyboardUtils.getKeyboardForHomework();
-            String keyboardJson = new ObjectMapper().writeValueAsString(keyboardObject);
-
-            vkApiClient.sendMessage(userId, messagesResource.getString("keyboard_received"), keyboardJson);
-        }
-
     }
 
-
+    private boolean isCommand(String messageText, String command) {
+        return messageText.equalsIgnoreCase(messagesResource.getString(command));
+    }
 }

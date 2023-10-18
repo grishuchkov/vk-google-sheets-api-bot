@@ -1,5 +1,7 @@
 package ru.grishuchkov.vkgooglesheetsapibot;
 
+import com.vk.api.sdk.client.VkApiClient;
+import com.vk.api.sdk.httpclient.HttpTransportClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -26,6 +28,11 @@ public class AppConfig {
     @Bean
     public RestTemplate restTemplate(){
         return new RestTemplate();
+    }
+
+    @Bean
+    public VkApiClient vkApiClient(){
+        return new VkApiClient(new HttpTransportClient());
     }
 
     @Bean
