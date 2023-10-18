@@ -33,12 +33,17 @@ public class VkApiClient {
     @Value("${apiVersion}")
     private String apiVersion;
 
+    public void sendMessage(String userId, String text){
+        sendMessage(userId, text, null);
+    }
 
     public void sendMessage(String userId, String text, String keyboard) {
-        SendMessageBuilder messageBuilder = new SendMessageBuilder(userId, text);
-        messageBuilder.withKeyboard(keyboard);
+        SendMessageBuilder messageBuilder = new SendMessageBuilder(userId, text, keyboard);
+
+        UriComponentsBuilder baseUrlComponent = getPreparedBaseUrlComponent("messages.send");
+
         URI sendMessageUri = messageBuilder
-                                .returnUri(getPreparedBaseUrlComponent())
+                                .returnUri(baseUrlComponent)
                                 .build()
                                 .toUri();
 
@@ -48,10 +53,10 @@ public class VkApiClient {
 
     public String getConfirmationCode(String groupId) {
 
-        URI getConfirmationCodeUri = getPreparedBaseUrlComponent().
-                queryParam("group_id", groupId)
-                .buildAndExpand("groups.getCallbackConfirmationCode")
-                .toUri();
+        URI getConfirmationCodeUri = getPreparedBaseUrlComponent("groups.getCallbackConfirmationCode")
+                                .queryParam("group_id", groupId)
+                                .build()
+                                .toUri();
 
         ResponseEntity<JsonNode> response = restTemplate.postForEntity(getConfirmationCodeUri,
                 new HttpEntity<>(null), JsonNode.class);
@@ -59,10 +64,10 @@ public class VkApiClient {
         return Objects.requireNonNull(response.getBody()).get("response").get("code").asText();
     }
 
-    private UriComponentsBuilder getPreparedBaseUrlComponent() {
+    private UriComponentsBuilder getPreparedBaseUrlComponent(String apiMethod) {
         int randomId = random.nextInt();
 
-        return UriComponentsBuilder.fromHttpUrl(vkApiUrl + "messages.send")
+        return UriComponentsBuilder.fromHttpUrl(vkApiUrl + apiMethod)
                 .queryParam("v", apiVersion)
                 .queryParam("random_id", randomId)
                 .queryParam("access_token", token);

@@ -4,18 +4,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 public class SendMessageBuilder {
 
-    private String userId;
-    private String message;
+    private final String userId;
+    private final String message;
     private String keyboard;
 
-    public SendMessageBuilder(String userId, String message) {
+    public SendMessageBuilder(String userId, String message, String keyboard) {
         this.userId = userId;
         this.message = message;
-    }
-
-    public SendMessageBuilder withKeyboard(String keyboard) {
         this.keyboard = keyboard;
-        return this;
     }
 
     public UriComponentsBuilder returnUri(UriComponentsBuilder baseUri) {
