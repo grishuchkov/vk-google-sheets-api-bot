@@ -1,4 +1,4 @@
-package ru.grishuchkov.vkgooglesheetsapibot.client;
+package ru.grishuchkov.vkgooglesheetsapibot.client.ifcs;
 
 import com.vk.api.sdk.objects.messages.Keyboard;
 
@@ -11,4 +11,6 @@ public interface VkApiClient {
     String getConfirmationCode(Integer groupId);
 
     void sendMessageEventAnswer(Integer groupId, Integer userId, Integer peerId, String eventId);
+
+    String getUserScreenNameByUserId(int groupId, int userId);
 }

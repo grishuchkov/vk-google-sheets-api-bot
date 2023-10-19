@@ -3,12 +3,16 @@ package ru.grishuchkov.vkgooglesheetsapibot.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vk.api.sdk.objects.messages.Keyboard;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
-import ru.grishuchkov.vkgooglesheetsapibot.client.VkApiClient;
+import ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.GoogleSheetsApiClient;
+import ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.VkApiClient;
+import ru.grishuchkov.vkgooglesheetsapibot.dto.Homework;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageEventRequest;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageRequest;
 import ru.grishuchkov.vkgooglesheetsapibot.utils.CallbackRequestMapper;
 import ru.grishuchkov.vkgooglesheetsapibot.utils.KeyboardUtil;
+import ru.grishuchkov.vkgooglesheetsapibot.utils.MessageUtils;
 
 import java.util.ResourceBundle;
 
@@ -16,10 +20,14 @@ import java.util.ResourceBundle;
 @RequiredArgsConstructor
 public class VkCallbackService implements CallbackService {
 
-    private final CallbackRequestMapper callbackRequestMapper;
     private final ResourceBundle messagesResource;
+
     private final VkApiClient vkClient;
+    private final GoogleSheetsApiClient sheetsApiClient;
+
     private final KeyboardUtil keyboardUtil;
+    private final MessageUtils messageUtils;
+    private final CallbackRequestMapper callbackRequestMapper;
 
     @Override
     public String getConfirmationCode(JsonNode json) {
@@ -47,15 +55,28 @@ public class VkCallbackService implements CallbackService {
         int userId = request.getUserId();
         int groupId = request.getGroupId();
 
-        if(isSubmitHomeworkMessage(messageText, "submit_homework_command")){
-            vkClient.sendMessage(groupId, userId, messagesResource.getString("homework_received"));
+        if(messageUtils.isSubmitHomeworkMessage(messageText, "submit_homework_command")){
+            int homeworkNumber = messageUtils.extractHomeworkNumber(messageText);
+            processSubmitHomework(groupId, new Homework(userId, homeworkNumber));
         }
 
-        if (isMessageCommand(messageText, "homework_keyboard_command")) {
+        if (messageUtils.isMessageCommand(messageText, "homework_keyboard_command")) {
             Keyboard homeworkKeyboard = keyboardUtil.getHomeworkKeyboard();
-
-            vkClient.sendMessage(groupId, userId, messagesResource.getString("homework_keyboard_received"), homeworkKeyboard);
+            vkClient.sendMessage(groupId, userId,
+                    messagesResource.getString("homework_keyboard_received"), homeworkKeyboard);
         }
+    }
+
+    @SneakyThrows
+    private void processSubmitHomework(int groupId, Homework homework){
+        vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_received"));
+
+        String screenName = vkClient.getUserScreenNameByUserId(groupId, homework.getUserId());
+        homework.setScreenName(screenName);
+
+        sheetsApiClient.sendHomework(homework);
+
+        vkClient.sendMessage(groupId, homework.getUserId(), "Дз отправили!");
     }
 
     private void processMessageEvent(JsonNode jsonNode) {
@@ -67,13 +88,5 @@ public class VkCallbackService implements CallbackService {
         String eventId = request.getObjectEventId();
 
         vkClient.sendMessageEventAnswer(groupId, userId, peerId, eventId);
-    }
-
-    private boolean isMessageCommand(String messageText, String command) {
-        return messageText.equalsIgnoreCase(messagesResource.getString(command));
-    }
-
-    private boolean isSubmitHomeworkMessage(String messageText, String submitHomeworkCommand){
-       return messageText.regionMatches(true, 0,  messagesResource.getString(submitHomeworkCommand), 0, 10);
     }
 }

@@ -4,14 +4,17 @@ import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.objects.groups.responses.GetCallbackConfirmationCodeResponse;
 import com.vk.api.sdk.objects.messages.Keyboard;
+import com.vk.api.sdk.objects.users.Fields;
+import com.vk.api.sdk.objects.users.responses.GetResponse;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Random;
 
 @Service
-public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.VkApiClient {
+public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.VkApiClient {
 
     @Value("${apiToken}")
     private String token;
@@ -31,9 +34,9 @@ public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.VkAp
 
     @Override
     @SneakyThrows
-    public void sendMessage(Integer groupId, Integer userId, String text, Keyboard keyboard){
+    public void sendMessage(Integer groupId, Integer userId, String text, Keyboard keyboard) {
         Keyboard keyboardObject = new Keyboard();
-        if(keyboard != null){
+        if (keyboard != null) {
             keyboardObject = keyboard;
         }
 
@@ -60,7 +63,23 @@ public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.VkAp
     public void sendMessageEventAnswer(Integer groupId, Integer userId, Integer peerId, String eventId) {
         vk.messages()
                 .sendMessageEventAnswer(new GroupActor(groupId, token), eventId, userId, peerId)
-                .eventData("{\"message\": \"Ghbdtn\"}")
+                .eventData("{\"type\": \"message\"," +
+                        "\"text\": \"Мы очень пытаемся отправить вашу работу на проверку!\"}")
                 .execute();
+    }
+
+    @SneakyThrows
+    public String getUserScreenNameByUserId(int groupId, int userId) {
+        List<GetResponse> response = vk.users()
+                .get(new GroupActor(groupId, token))
+                .userIds(String.valueOf(userId))
+                .fields(Fields.SCREEN_NAME)
+                .execute();
+
+        if(response.isEmpty()){
+            throw new RuntimeException("getUserScreenNameByUserId failed");
+        }
+
+        return response.get(0).getScreenName();
     }
 }
