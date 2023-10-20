@@ -13,4 +13,6 @@ public interface VkApiClient {
     void sendMessageEventAnswer(Integer groupId, Integer userId, Integer peerId, String eventId);
 
     String getUserScreenNameByUserId(int groupId, int userId);
+
+    Integer getUserIdByScreenName(int groupId, String screenName);
 }

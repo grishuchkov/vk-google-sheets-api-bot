@@ -16,7 +16,7 @@ import java.util.Random;
 @Service
 public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.VkApiClient {
 
-    @Value("${apiToken}")
+    @Value("${vkApiToken}")
     private String token;
     private final Random random;
     private final VkApiClient vk;
@@ -81,5 +81,20 @@ public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.ifcs
         }
 
         return response.get(0).getScreenName();
+    }
+
+    @SneakyThrows
+    @Override
+    public Integer getUserIdByScreenName(int groupId, String screenName) {
+        List<GetResponse> response = vk.users()
+                .get(new GroupActor(groupId, token))
+                .userIds(screenName)
+                .execute();
+
+        if(response.isEmpty()){
+            throw new RuntimeException("getUserIdByScreenName failed");
+        }
+
+        return response.get(0).getId();
     }
 }
