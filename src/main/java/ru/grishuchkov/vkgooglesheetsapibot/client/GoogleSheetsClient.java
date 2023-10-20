@@ -29,8 +29,8 @@ public class GoogleSheetsClient implements GoogleSheetsApiClient {
     private String urlGoogleSheetsApi;
 
     @Override
-    public String sendHomework(Homework homework) {
 
+    public String sendHomework(Homework homework) throws JsonProcessingException {
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(urlGoogleSheetsApi)
                 .queryParam("action", "addHomework")
@@ -41,19 +41,20 @@ public class GoogleSheetsClient implements GoogleSheetsApiClient {
 
         ResponseEntity<String> response = restTemplate.postForEntity(uri, new HttpEntity<>(null), String.class);
 
-        String redirectUrl = Objects.requireNonNull(response.getHeaders().getLocation()).toString();
-        ResponseEntity<String> redirectedResponse = restTemplate.getForEntity(redirectUrl, String.class);
 
-        JsonNode body;
-        try {
-            body = new ObjectMapper().readTree(redirectedResponse.getBody());
-        } catch (JsonProcessingException e) {
-            throw new JsonParseFiledException();
+        if(response.getStatusCode() == HttpStatus.FOUND){
+            String redirectUrl = response.getHeaders().getLocation().toString();
+            ResponseEntity<String> redirectedResponse = restTemplate.getForEntity(redirectUrl, String.class);
+            String result = redirectedResponse.getBody();
+
+            JsonNode body = new ObjectMapper().readTree(result);
+
+            if (body.get("statusCode").asInt() != HttpStatus.OK.value()){
+                throw new BadStatusCodeException("Google returned bad status code at sendHomework()");
+            }
         }
 
-        if (body.get("statusCode").asInt() != HttpStatus.OK.value()){
-            throw new BadStatusCodeException("Google returned bad status code at sendHomework()");
-        }
+
 
         return "ok";
     }
