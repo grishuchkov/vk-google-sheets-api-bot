@@ -13,8 +13,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 @Configuration
-@PropertySource("classpath:vkapiclient.properties")
-@PropertySource("classpath:google-sheet-api.properties")
 public class AppConfig {
     @Bean
     public ThreadPoolTaskExecutor taskExecutor() {

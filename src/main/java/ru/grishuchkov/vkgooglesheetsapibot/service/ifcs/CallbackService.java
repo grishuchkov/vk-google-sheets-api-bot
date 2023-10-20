@@ -1,4 +1,4 @@
-package ru.grishuchkov.vkgooglesheetsapibot.service;
+package ru.grishuchkov.vkgooglesheetsapibot.service.ifcs;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

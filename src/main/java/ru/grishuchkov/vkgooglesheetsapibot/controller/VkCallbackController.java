@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.grishuchkov.vkgooglesheetsapibot.enums.CallbackType;
-import ru.grishuchkov.vkgooglesheetsapibot.service.CallbackService;
+import ru.grishuchkov.vkgooglesheetsapibot.service.ifcs.CallbackService;
 
 @RestController
 public class VkCallbackController {

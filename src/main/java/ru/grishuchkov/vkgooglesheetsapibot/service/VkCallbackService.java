@@ -9,6 +9,7 @@ import ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.VkApiClient;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.Homework;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageEventRequest;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageRequest;
+import ru.grishuchkov.vkgooglesheetsapibot.service.ifcs.CallbackService;
 import ru.grishuchkov.vkgooglesheetsapibot.utils.CallbackRequestMapper;
 import ru.grishuchkov.vkgooglesheetsapibot.utils.KeyboardUtil;
 import ru.grishuchkov.vkgooglesheetsapibot.utils.MessageUtils;
@@ -73,7 +74,7 @@ public class VkCallbackService implements CallbackService {
         try {
             sheetsApiClient.sendHomework(homework);
             vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_successfully_sent"));
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_sending_error"));
         }
     }
