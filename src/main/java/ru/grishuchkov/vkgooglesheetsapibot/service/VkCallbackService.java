@@ -3,7 +3,6 @@ package ru.grishuchkov.vkgooglesheetsapibot.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vk.api.sdk.objects.messages.Keyboard;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.GoogleSheetsApiClient;
 import ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.VkApiClient;
@@ -21,10 +20,8 @@ import java.util.ResourceBundle;
 public class VkCallbackService implements CallbackService {
 
     private final ResourceBundle messagesResource;
-
     private final VkApiClient vkClient;
     private final GoogleSheetsApiClient sheetsApiClient;
-
     private final KeyboardUtil keyboardUtil;
     private final MessageUtils messageUtils;
     private final CallbackRequestMapper callbackRequestMapper;
@@ -67,16 +64,18 @@ public class VkCallbackService implements CallbackService {
         }
     }
 
-    @SneakyThrows
     private void processSubmitHomework(int groupId, Homework homework){
-        vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_received"));
+        vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_attempt_to_send"));
 
         String screenName = vkClient.getUserScreenNameByUserId(groupId, homework.getUserId());
         homework.setScreenName(screenName);
 
-        sheetsApiClient.sendHomework(homework);
-
-        vkClient.sendMessage(groupId, homework.getUserId(), "Дз отправили!");
+        try {
+            sheetsApiClient.sendHomework(homework);
+            vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_successfully_sent"));
+        } catch (RuntimeException e) {
+            vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_sending_error"));
+        }
     }
 
     private void processMessageEvent(JsonNode jsonNode) {

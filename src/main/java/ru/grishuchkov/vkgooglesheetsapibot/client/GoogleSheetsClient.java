@@ -1,9 +1,9 @@
 package ru.grishuchkov.vkgooglesheetsapibot.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -13,8 +13,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.GoogleSheetsApiClient;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.Homework;
+import ru.grishuchkov.vkgooglesheetsapibot.exception.BadStatusCodeException;
+import ru.grishuchkov.vkgooglesheetsapibot.exception.JsonParseFiledException;
 
 import java.net.URI;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +29,6 @@ public class GoogleSheetsClient implements GoogleSheetsApiClient {
     private String urlGoogleSheetsApi;
 
     @Override
-    @SneakyThrows
     public String sendHomework(Homework homework) {
 
         URI uri = UriComponentsBuilder
@@ -39,14 +41,18 @@ public class GoogleSheetsClient implements GoogleSheetsApiClient {
 
         ResponseEntity<String> response = restTemplate.postForEntity(uri, new HttpEntity<>(null), String.class);
 
-        if(response.getStatusCode() == HttpStatus.FOUND){
-            String redirectUrl = response.getHeaders().getLocation().toString();
-            ResponseEntity<String> redirectedResponse = restTemplate.getForEntity(redirectUrl, String.class);
-            String result = redirectedResponse.getBody();
+        String redirectUrl = Objects.requireNonNull(response.getHeaders().getLocation()).toString();
+        ResponseEntity<String> redirectedResponse = restTemplate.getForEntity(redirectUrl, String.class);
 
-            JsonNode json = new ObjectMapper().readTree(result);
+        JsonNode body;
+        try {
+            body = new ObjectMapper().readTree(redirectedResponse.getBody());
+        } catch (JsonProcessingException e) {
+            throw new JsonParseFiledException();
+        }
 
-            int statusCode = json.get("statusCode").asInt();
+        if (body.get("statusCode").asInt() != HttpStatus.OK.value()){
+            throw new BadStatusCodeException("Google returned bad status code at sendHomework()");
         }
 
         return "ok";
