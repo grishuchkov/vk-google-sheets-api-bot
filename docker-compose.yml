@@ -1,0 +1,10 @@
+version: '3'
+services:
+  google-sheet-bot:
+    image: grishuchkov/google-sheet-bot:v2
+    container_name: google-sheet-vk-bot
+    ports:
+      - 8080:80
+    env_file:
+      - .env
+    restart: always
