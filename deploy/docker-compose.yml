@@ -1,0 +1,33 @@
+version: '3'
+services:
+  google-sheet-bot:
+    image: grishuchkov/google-sheet-bot:v2
+    container_name: google-sheet-vk-bot
+    ports:
+      - 8080:8080
+    env_file:
+      - .env
+    restart: always
+
+  proxy:
+    container_name: nginx
+    image: nginx:stable
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    restart: always
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    environment:
+      - TZ=Eroupe/Moscow
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/portainer/portainer_data:/portainer_data
+    ports:
+      - "8000:8000"
+      - "9443:9443"
+      - "9000:9000"
+    restart: always
