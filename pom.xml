@@ -8,37 +8,53 @@
 		<version>3.1.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>ru.grishuchkov</groupId>
 	<artifactId>vk-google-sheets-api-bot</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>vk-google-sheets-api-bot</name>
-	<description>REST API bot for VK.COM, that communicate with GoogleSheets</description>
+
+	<description>REST API bot for VK.COM, that communicate with Google Sheets</description>
+
 	<properties>
 		<java.version>17</java.version>
+
+		<logback.version>1.4.11</logback.version>
+		<vk.sdk.version>1.0.14</vk.sdk.version>
 	</properties>
+
 	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.4.11</version>
+		</dependency>
+
+
+
 
 		<dependency>
 			<groupId>com.vk.api</groupId>
 			<artifactId>sdk</artifactId>
-			<version>1.0.14</version>
+			<version>${vk.sdk.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
 
 	<build>
