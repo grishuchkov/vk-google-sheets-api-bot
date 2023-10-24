@@ -19,7 +19,10 @@
 	<properties>
 		<java.version>17</java.version>
 
-		<logback.version>1.4.11</logback.version>
+		<lombok.version>1.18.24</lombok.version>
+		<log4j.version>1.2.17</log4j.version>
+
+		<telegram.sdk.version>6.8.0</telegram.sdk.version>
 		<vk.sdk.version>1.0.14</vk.sdk.version>
 	</properties>
 
@@ -27,18 +30,19 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<version>${lombok.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.4.11</version>
+			<groupId>org.telegram</groupId>
+			<artifactId>telegrambots-spring-boot-starter</artifactId>
+			<version>${telegram.sdk.version}</version>
 		</dependency>
-
-
-
-
 		<dependency>
 			<groupId>com.vk.api</groupId>
 			<artifactId>sdk</artifactId>
