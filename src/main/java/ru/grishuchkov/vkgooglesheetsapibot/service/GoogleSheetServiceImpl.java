@@ -17,7 +17,7 @@ public class GoogleSheetServiceImpl implements GoogleSheetService {
     private final VkApiClient vkApiClient;
     private final ResourceBundle messagesResource;
 
-    @Value("${vkGroupIdForCourse}")
+    @Value("${vk.api.groupId}")
     private int courseGroupId;
 
     @Override

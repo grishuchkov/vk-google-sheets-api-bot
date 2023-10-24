@@ -1,0 +1,10 @@
+vk.api:
+  token: ${VK_API_TOKEN}
+  groupId: ${COURSE_GROUP_ID}
+
+telegram.api:
+  token: ${TELEGRAM_API_TOKEN}
+  botName: ura_ua_sdelal_bot
+
+google.sheet.api:
+  url: ${GOOGLE_SHEET_API_URL}

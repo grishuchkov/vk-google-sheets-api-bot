@@ -16,7 +16,7 @@ import java.util.Random;
 @Service
 public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.VkApiClient {
 
-    @Value("${vkApiToken}")
+    @Value("${vk.api.token}")
     private String token;
     private final Random random;
     private final VkApiClient vk;
