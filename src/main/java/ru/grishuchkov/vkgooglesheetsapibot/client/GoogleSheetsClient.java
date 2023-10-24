@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -21,15 +23,15 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Log4j
 public class GoogleSheetsClient implements GoogleSheetsApiClient {
 
     private final RestTemplate restTemplate;
 
-    @Value("${googleSheetApiUrl}")
+    @Value("${google.sheet.api.url}")
     private String urlGoogleSheetsApi;
 
     @Override
-
     public String sendHomework(Homework homework) throws JsonProcessingException {
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(urlGoogleSheetsApi)
@@ -41,7 +43,6 @@ public class GoogleSheetsClient implements GoogleSheetsApiClient {
 
         ResponseEntity<String> response = restTemplate.postForEntity(uri, new HttpEntity<>(null), String.class);
 
-
         if(response.getStatusCode() == HttpStatus.FOUND){
             String redirectUrl = response.getHeaders().getLocation().toString();
             ResponseEntity<String> redirectedResponse = restTemplate.getForEntity(redirectUrl, String.class);
@@ -49,13 +50,13 @@ public class GoogleSheetsClient implements GoogleSheetsApiClient {
 
             JsonNode body = new ObjectMapper().readTree(result);
 
-            if (body.get("statusCode").asInt() != HttpStatus.OK.value()){
-                throw new BadStatusCodeException("Google returned bad status code at sendHomework()");
+            if (body.get("statusCode").asInt() == HttpStatus.OK.value()){
+                log.debug("sendHomework method was executed successfully");
+                return "ok";
             }
         }
 
-
-
-        return "ok";
+        log.error("Google returned bad status code at sendHomework()");
+        throw new BadStatusCodeException("Google returned bad status code at sendHomework()");
     }
 }
