@@ -7,9 +7,11 @@ import org.springframework.stereotype.Service;
 import ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.GoogleSheetsApiClient;
 import ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.VkApiClient;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.Homework;
+import ru.grishuchkov.vkgooglesheetsapibot.dto.SendHomeworkResponse;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageEventRequest;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageRequest;
 import ru.grishuchkov.vkgooglesheetsapibot.service.ifcs.CallbackService;
+import ru.grishuchkov.vkgooglesheetsapibot.service.ifcs.TelegramBotService;
 import ru.grishuchkov.vkgooglesheetsapibot.utils.CallbackRequestMapper;
 import ru.grishuchkov.vkgooglesheetsapibot.utils.KeyboardUtil;
 import ru.grishuchkov.vkgooglesheetsapibot.utils.MessageUtils;
@@ -21,6 +23,7 @@ import java.util.ResourceBundle;
 public class VkCallbackService implements CallbackService {
 
     private final ResourceBundle messagesResource;
+    private final TelegramBotService telegram;
     private final VkApiClient vkClient;
     private final GoogleSheetsApiClient sheetsApiClient;
     private final KeyboardUtil keyboardUtil;
@@ -72,8 +75,9 @@ public class VkCallbackService implements CallbackService {
         homework.setScreenName(screenName);
 
         try {
-            sheetsApiClient.sendHomework(homework);
+            SendHomeworkResponse googleResponse = sheetsApiClient.sendHomework(homework);
             vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_successfully_sent"));
+            telegram.sendMessage(googleResponse.getTelegramChatId(), "Test message");
         } catch (Exception e) {
             vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_sending_error"));
         }
