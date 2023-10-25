@@ -3,6 +3,7 @@ package ru.grishuchkov.vkgooglesheetsapibot.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vk.api.sdk.objects.messages.Keyboard;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 import ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.GoogleSheetsApiClient;
 import ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.VkApiClient;
@@ -10,6 +11,7 @@ import ru.grishuchkov.vkgooglesheetsapibot.dto.Homework;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.SendHomeworkResponse;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageEventRequest;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageRequest;
+import ru.grishuchkov.vkgooglesheetsapibot.exception.VkClientException;
 import ru.grishuchkov.vkgooglesheetsapibot.service.ifcs.CallbackService;
 import ru.grishuchkov.vkgooglesheetsapibot.service.ifcs.TelegramBotService;
 import ru.grishuchkov.vkgooglesheetsapibot.utils.CallbackRequestMapper;
@@ -20,6 +22,7 @@ import java.util.ResourceBundle;
 
 @Service
 @RequiredArgsConstructor
+@Log4j
 public class VkCallbackService implements CallbackService {
 
     private final ResourceBundle messagesResource;
@@ -78,8 +81,12 @@ public class VkCallbackService implements CallbackService {
             SendHomeworkResponse googleResponse = sheetsApiClient.sendHomework(homework);
             vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_successfully_sent"));
             telegram.sendMessage(googleResponse.getTelegramChatId(), "Test message");
-        } catch (Exception e) {
+
+        } catch (VkClientException e) {
+            log.warn(e);
             vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_sending_error"));
+        } catch (Exception e){
+            log.error(e);
         }
     }
 
