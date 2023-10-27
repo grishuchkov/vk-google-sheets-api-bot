@@ -16,16 +16,22 @@ public class MessageUtils {
         return messageText.equalsIgnoreCase(messagesResource.getString(command));
     }
 
-    public boolean isSubmitHomeworkMessage(String messageText, String submitHomeworkCommand){
+    public boolean isSubmitHomeworkMessage(String messageText, String submitHomeworkCommand) {
         boolean messageMatchesWithCommand = messageText.regionMatches
                 (true, 0, messagesResource.getString(submitHomeworkCommand), 0, 10);
 
         boolean isCorrectLengthMessage = messageText.length() == 11 || messageText.length() == 12;
 
-        return messageMatchesWithCommand  && isCorrectLengthMessage;
+        return messageMatchesWithCommand && isCorrectLengthMessage;
     }
 
-    public int extractHomeworkNumber(String messageText){
+    public int extractHomeworkNumber(String messageText) {
         return Integer.parseInt(messageText.split("№")[1]);
+    }
+
+    public String prepareTelegramNotificationMessage(String studentName, String numberOfWork) {
+        String messageTemplate = messagesResource.getString("telegram_notification_message");
+
+        return String.format(messageTemplate, studentName, numberOfWork);
     }
 }
