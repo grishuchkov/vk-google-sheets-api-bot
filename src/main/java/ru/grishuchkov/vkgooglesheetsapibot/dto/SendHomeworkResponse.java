@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class SendHomeworkResponse {
     private int statusCode;
-    private String numberOfWork;
     private String telegramChatId;
+    private String studentName;
+    private String numberOfWork;
 }

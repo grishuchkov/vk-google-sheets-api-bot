@@ -59,7 +59,7 @@ public class VkCallbackService implements CallbackService {
         int userId = request.getUserId();
         int groupId = request.getGroupId();
 
-        if(messageUtils.isSubmitHomeworkMessage(messageText, "submit_homework_command")){
+        if (messageUtils.isSubmitHomeworkMessage(messageText, "submit_homework_command")) {
             int homeworkNumber = messageUtils.extractHomeworkNumber(messageText);
             processSubmitHomework(groupId, new Homework(userId, homeworkNumber));
         }
@@ -71,7 +71,7 @@ public class VkCallbackService implements CallbackService {
         }
     }
 
-    private void processSubmitHomework(int groupId, Homework homework){
+    private void processSubmitHomework(int groupId, Homework homework) {
         vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_attempt_to_send"));
 
         String screenName = vkClient.getUserScreenNameByUserId(groupId, homework.getUserId());
@@ -79,13 +79,20 @@ public class VkCallbackService implements CallbackService {
 
         try {
             SendHomeworkResponse googleResponse = sheetsApiClient.sendHomework(homework);
-            vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_successfully_sent"));
-            telegram.sendMessage(googleResponse.getTelegramChatId(), "Test message");
+
+            vkClient.sendMessage(groupId, homework.getUserId(),
+                    messagesResource.getString("homework_successfully_sent"));
+
+            if (!googleResponse.getTelegramChatId().isEmpty()) {
+                telegram.processHomeworkNotificationMessage(googleResponse.getTelegramChatId(),
+                        googleResponse.getStudentName(),
+                        googleResponse.getNumberOfWork());
+            }
 
         } catch (VkClientException e) {
             log.warn(e);
             vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_sending_error"));
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error(e);
         }
     }
