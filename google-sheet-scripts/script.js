@@ -1,15 +1,21 @@
-const BASE_URL = "https://1512-109-68-118-237.ngrok-free.app";
+const BASE_URL = "http://45.12.75.36:80";
 const SEND_CHECK_METHOD = "/api/v1/check-notification"
 
 const sheetName = "Активный месяц";
+const CONFIGURATION_SHEET_NAME = "Конфигурация";
 
 const USER_LINKS_COLLUMN = 2; // Номер колонки с ссылками на рабочем листе
+const EXAMINER_COLLUMN = 5;
 const FIRST_HOMEWORK_COLLUMN = 6;
 const LAST_HOMEWORK_COLLUMN = 13;
 const MAX_NUMBER_OF_HOMEWORK = 8;
 
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 
+var configurationSheet = ss.getSheetByName(CONFIGURATION_SHEET_NAME);
+const EXAMINER_NAME_COLLUMN = 3;
+const CHAT_ID_COLLUMN = 4;
+const CONFIRM_TOGGLE_COLLUMN = 5;
 
 var activeSheet = ss.getSheetByName(sheetName);
 var activeCell = activeSheet.getActiveCell();
@@ -17,6 +23,7 @@ var activeRow = activeCell.getRow();
 var activeColumn = activeCell.getColumn();
 var colorOfCell = activeCell.getBackground();
 var actualSheetName = ss.getActiveSheet().getName();
+
 
 function doPost(request) {
     var action = request.parameter.action;
@@ -49,8 +56,36 @@ function addHomework(request) {
 
     activeSheet.getRange(userRow, FIRST_HOMEWORK_COLLUMN - 1 + numberOfHomework).setValue("+");
 
-    return ContentService.createTextOutput(JSON.stringify({statusCode: 200}))
+    var studentName = activeSheet.getRange(userRow, USER_LINKS_COLLUMN).getValue();
+    var examinerName = activeSheet.getRange(userRow, EXAMINER_COLLUMN).getValue();
+
+    var chatId = getTelegramChatIdByExaminer(examinerName);
+
+    var data = {
+        'statusCode': 200,
+        'numberOfWork': numberOfHomework,
+        'telegramChatId': chatId,
+        'studentName': studentName
+    };
+
+    return ContentService.createTextOutput(JSON.stringify(data))
         .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getTelegramChatIdByExaminer(examinerName) {
+    let configurationLastRow = configurationSheet.getLastRow() + 1;
+
+    for (let i = 2; i < configurationLastRow; i++) {
+        var name = configurationSheet.getRange(i, EXAMINER_NAME_COLLUMN).getValue();
+        var toggle = configurationSheet.getRange(i, CONFIRM_TOGGLE_COLLUMN).getValue();
+        var id = configurationSheet.getRange(i, CHAT_ID_COLLUMN).getValue();
+
+        if (name === examinerName && toggle === "Да") {
+            return id;
+        }
+    }
+
+    return "";
 }
 
 function findUserRowBySceenName(userScreenName) {
