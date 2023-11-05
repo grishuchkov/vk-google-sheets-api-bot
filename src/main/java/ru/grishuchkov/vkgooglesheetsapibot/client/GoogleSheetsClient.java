@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.GoogleSheetsApiClient;
+import ru.grishuchkov.vkgooglesheetsapibot.dto.GoogleResponse;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.Homework;
-import ru.grishuchkov.vkgooglesheetsapibot.dto.SendHomeworkResponse;
-import ru.grishuchkov.vkgooglesheetsapibot.exception.BadStatusCodeException;
+import ru.grishuchkov.vkgooglesheetsapibot.exception.GoogleClientException;
 
 import java.net.URI;
 
@@ -27,7 +27,7 @@ public class GoogleSheetsClient implements GoogleSheetsApiClient {
     private String urlGoogleSheetsApi;
 
     @Override
-    public SendHomeworkResponse sendHomework(Homework homework){
+    public GoogleResponse sendHomework(Homework homework){
 
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(urlGoogleSheetsApi)
@@ -40,19 +40,14 @@ public class GoogleSheetsClient implements GoogleSheetsApiClient {
         ResponseEntity<String> sendResponse = restTemplate.postForEntity(uri, new HttpEntity<>(null), String.class);
 
         if(sendResponse.getStatusCode() != HttpStatus.FOUND){
-           throw new RuntimeException("Internal exception");
+            log.error("There is no redirecting URL in Google's response to get the data.");
+            throw new GoogleClientException("There is no redirecting URL in Google's response to get the data.");
         }
 
         String redirectUrl = sendResponse.getHeaders().getLocation().toString();
-        ResponseEntity<SendHomeworkResponse> redirectedResponse = restTemplate.getForEntity(redirectUrl, SendHomeworkResponse.class);
+        ResponseEntity<GoogleResponse> redirectedResponse = restTemplate.getForEntity(redirectUrl, GoogleResponse.class);
 
-        SendHomeworkResponse body = redirectedResponse.getBody();
-
-        if (body.getStatusCode() != HttpStatus.OK.value()){
-            log.error("Google returned bad status code at sendHomework()");
-            throw new BadStatusCodeException("Google returned bad status code at sendHomework()");
-        }
-
+        GoogleResponse body = redirectedResponse.getBody();
         log.info("sendHomework method was executed successfully");
         return body;
     }

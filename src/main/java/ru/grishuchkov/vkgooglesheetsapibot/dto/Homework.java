@@ -1,10 +1,12 @@
 package ru.grishuchkov.vkgooglesheetsapibot.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class Homework {
     private int userId;
     private String screenName;

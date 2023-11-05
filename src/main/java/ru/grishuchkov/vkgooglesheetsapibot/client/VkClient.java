@@ -14,6 +14,7 @@ import com.vk.api.sdk.queries.messages.MessagesSendQuery;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.grishuchkov.vkgooglesheetsapibot.dto.VkMessage;
 import ru.grishuchkov.vkgooglesheetsapibot.exception.VkClientException;
 
 import java.util.List;
@@ -41,11 +42,13 @@ public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.ifcs
     }
 
     @Override
+    @Deprecated
     public void sendMessage(Integer groupId, Integer userId, String text) {
         sendMessage(groupId, userId, text, null);
     }
 
     @Override
+    @Deprecated
     public void sendMessage(Integer groupId, Integer userId, String text, Keyboard keyboard) {
         Keyboard keyboardObject = new Keyboard();
         if (keyboard != null) {
@@ -56,6 +59,24 @@ public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.ifcs
                 .send(new GroupActor(groupId, token))
                 .userId(userId)
                 .message(text)
+                .keyboard(keyboardObject)
+                .randomId(random.nextInt());
+
+        executeRequest(request);
+    }
+
+    @Override
+    public void sendMessage(VkMessage message) {
+        Keyboard keyboardObject = new Keyboard();
+
+        if(message.hasKeyboard()){
+            keyboardObject = message.getKeyboard();
+        }
+
+        MessagesSendQuery request = vk.messages()
+                .send(new GroupActor(message.getGroupId(), token))
+                .userId(message.getUserId())
+                .message(message.getText())
                 .keyboard(keyboardObject)
                 .randomId(random.nextInt());
 

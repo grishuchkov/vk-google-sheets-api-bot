@@ -11,14 +11,18 @@ public class MessageUtils {
 
     private final ResourceBundle messagesResource;
 
+    private final String SUBMIT_HOMEWORK_COMMAND = messagesResource.getString("submit_homework_command");
+    private final String START_COMMAND = messagesResource.getString("homework_keyboard_command");
 
-    public boolean isMessageCommand(String messageText, String command) {
-        return messageText.equalsIgnoreCase(messagesResource.getString(command));
+
+    public boolean isStarCommand(String messageText) {
+        return messageText.equalsIgnoreCase(START_COMMAND);
     }
 
-    public boolean isSubmitHomeworkMessage(String messageText, String submitHomeworkCommand) {
+    public boolean isSubmitHomeworkCommand(String messageText) {
+
         boolean messageMatchesWithCommand = messageText.regionMatches
-                (true, 0, messagesResource.getString(submitHomeworkCommand), 0, 10);
+                (true, 0, SUBMIT_HOMEWORK_COMMAND, 0, 10);
 
         boolean isCorrectLengthMessage = messageText.length() == 11 || messageText.length() == 12;
 

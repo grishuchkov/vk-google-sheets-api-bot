@@ -1,9 +1,8 @@
 package ru.grishuchkov.vkgooglesheetsapibot.client.ifcs;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.Homework;
-import ru.grishuchkov.vkgooglesheetsapibot.dto.SendHomeworkResponse;
+import ru.grishuchkov.vkgooglesheetsapibot.dto.GoogleResponse;
 
 public interface GoogleSheetsApiClient {
-    SendHomeworkResponse sendHomework(Homework homework);
+    GoogleResponse sendHomework(Homework homework);
 }

@@ -1,6 +1,7 @@
 package ru.grishuchkov.vkgooglesheetsapibot.client.ifcs;
 
 import com.vk.api.sdk.objects.messages.Keyboard;
+import ru.grishuchkov.vkgooglesheetsapibot.dto.VkMessage;
 
 public interface VkApiClient {
 
@@ -15,4 +16,6 @@ public interface VkApiClient {
     String getUserScreenNameByUserId(int groupId, int userId);
 
     Integer getUserIdByScreenName(int groupId, String screenName);
+
+    void sendMessage(VkMessage message);
 }
