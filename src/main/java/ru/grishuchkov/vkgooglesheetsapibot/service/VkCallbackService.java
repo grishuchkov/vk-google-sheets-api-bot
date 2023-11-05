@@ -11,7 +11,7 @@ import ru.grishuchkov.vkgooglesheetsapibot.dto.Homework;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.SendHomeworkResponse;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageEventRequest;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.callback.MessageRequest;
-import ru.grishuchkov.vkgooglesheetsapibot.exception.VkClientException;
+import ru.grishuchkov.vkgooglesheetsapibot.exception.BadStatusCodeException;
 import ru.grishuchkov.vkgooglesheetsapibot.service.ifcs.CallbackService;
 import ru.grishuchkov.vkgooglesheetsapibot.service.ifcs.TelegramBotService;
 import ru.grishuchkov.vkgooglesheetsapibot.utils.CallbackRequestMapper;
@@ -89,7 +89,7 @@ public class VkCallbackService implements CallbackService {
                         googleResponse.getNumberOfWork());
             }
 
-        } catch (VkClientException e) {
+        } catch (BadStatusCodeException e) {
             log.warn(e);
             vkClient.sendMessage(groupId, homework.getUserId(), messagesResource.getString("homework_sending_error"));
         } catch (Exception e) {
