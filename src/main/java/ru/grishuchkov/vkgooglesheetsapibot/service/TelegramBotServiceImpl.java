@@ -19,7 +19,6 @@ public class TelegramBotServiceImpl implements TelegramBotService {
     public TelegramBotServiceImpl(MessageUtils messageUtils) {
         this.messageUtils = messageUtils;
     }
-
     public void registration(TelegramBot telegramBot) {
         this.telegramBot = telegramBot;
     }
@@ -31,27 +30,23 @@ public class TelegramBotServiceImpl implements TelegramBotService {
         }
 
         if (message.getText().equalsIgnoreCase("Дай ID")) {
-            String text = String.valueOf(message.getChatId());
-            sendMessage(text, text);
+            String id = String.valueOf(message.getChatId());
+            String text = id;
+
+            sendMessage(id, text);
         }
     }
 
     @Override
     public void sendMessage(String chatId, String text) {
-        SendMessage sendMessage = new SendMessage(chatId, text);
+        executeMessage(new SendMessage(chatId, text));
+    }
 
+    private void executeMessage(SendMessage sendMessage) {
         try {
             telegramBot.execute(sendMessage);
         } catch (TelegramApiException ex) {
             log.error(ex);
         }
-    }
-
-    @Override
-    public void processHomeworkNotificationMessage(String chatId, String studentName, String numberOfWork) {
-
-        String notificationMessage = messageUtils.prepareTelegramNotificationMessage(studentName, numberOfWork);
-
-        sendMessage(chatId, notificationMessage);
     }
 }

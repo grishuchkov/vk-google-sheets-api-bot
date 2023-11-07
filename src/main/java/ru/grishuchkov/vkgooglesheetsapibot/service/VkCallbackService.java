@@ -38,21 +38,21 @@ public class VkCallbackService implements CallbackService {
     private final String SUCCESS_MESSAGE = messagesResource.getString("homework_successfully_sent");
 
     @Override
-    public String getConfirmationCode(JsonNode json) {
-        int groupId = json.get("group_id").asInt();
+    public String getConfirmationCode(JsonNode requestJson) {
+        int groupId = requestJson.get("group_id").asInt();
 
         return vkClient.getConfirmationCode(groupId);
     }
 
     @Override
-    public void handle(JsonNode json) {
-        String typeOfRequest = json.get("type").asText();
+    public void handle(JsonNode requestJson) {
+        String typeOfRequest = requestJson.get("type").asText();
 
         if (typeOfRequest.equals("message_new")) {
-            processNewMessage(json);
+            processNewMessage(requestJson);
         }
         if (typeOfRequest.equals("message_event")) {
-            processMessageEvent(json);
+            processMessageEvent(requestJson);
         }
     }
 
@@ -74,6 +74,16 @@ public class VkCallbackService implements CallbackService {
         }
     }
 
+    private void prepareAndSendResponseToStartCommand(VkMessage message) {
+        String messageText = messagesResource.getString("homework_keyboard_received");
+        Keyboard homeworkKeyboard = keyboardUtil.getHomeworkKeyboard();
+
+        message.setKeyboard(homeworkKeyboard);
+        message.setText(messageText);
+
+        vkClient.sendMessage(message);
+    }
+
     private void processSubmitHomeworkCommand(VkMessage message) {
         sendMessageToUser(message, HOMEWORK_ATTEMPT_TEXT);
 
@@ -93,10 +103,9 @@ public class VkCallbackService implements CallbackService {
         }
     }
 
-    private void prepareAndSendTelegramNotification(GoogleResponse response) {
-        telegram.processHomeworkNotificationMessage(response.getTelegramChatId(),
-                response.getStudentName(),
-                response.getNumberOfWork());
+    private void sendMessageToUser(VkMessage message, String text) {
+        message.setText(text);
+        vkClient.sendMessage(message);
     }
 
     private Homework prepareHomeworkFromMessage(VkMessage message) {
@@ -113,19 +122,18 @@ public class VkCallbackService implements CallbackService {
                 .build();
     }
 
-    private void sendMessageToUser(VkMessage message, String text) {
-        message.setText(text);
-        vkClient.sendMessage(message);
+    private void prepareAndSendTelegramNotification(GoogleResponse response) {
+        String chatId = response.getTelegramChatId();
+        String text = prepareMessageTextFromGoogleResponse(response);
+
+        telegram.sendMessage(chatId, text);
     }
 
-    private void prepareAndSendResponseToStartCommand(VkMessage message) {
-        String messageText = messagesResource.getString("homework_keyboard_received");
-        Keyboard homeworkKeyboard = keyboardUtil.getHomeworkKeyboard();
+    private String prepareMessageTextFromGoogleResponse(GoogleResponse response) {
+        String studentName = response.getStudentName();
+        String numberOfWork = response.getNumberOfWork();
 
-        message.setKeyboard(homeworkKeyboard);
-        message.setText(messageText);
-
-        vkClient.sendMessage(message);
+        return messageUtils.prepareTelegramNotificationMessage(studentName, numberOfWork);
     }
 
     private void processMessageEvent(JsonNode jsonNode) {

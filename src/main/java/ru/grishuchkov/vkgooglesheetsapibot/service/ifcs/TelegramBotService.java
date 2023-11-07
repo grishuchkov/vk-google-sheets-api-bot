@@ -9,6 +9,4 @@ public interface TelegramBotService {
     void processMessage(Message message);
 
     void sendMessage(String chatId, String text);
-
-    void processHomeworkNotificationMessage(String chatId, String studentName, String numberOfWork);
 }
