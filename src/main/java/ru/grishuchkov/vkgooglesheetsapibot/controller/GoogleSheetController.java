@@ -6,7 +6,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import ru.grishuchkov.vkgooglesheetsapibot.dto.CheckNotification;
+import ru.grishuchkov.vkgooglesheetsapibot.dto.CheckNotificationRequest;
 import ru.grishuchkov.vkgooglesheetsapibot.service.ifcs.GoogleSheetService;
 
 @RestController
@@ -19,7 +19,7 @@ public class GoogleSheetController {
     }
 
     @PostMapping("/api/v1/check-notification")
-    public ResponseEntity<String> getCheckNotification(@RequestBody CheckNotification notification){
+    public ResponseEntity<String> getCheckNotification(@RequestBody CheckNotificationRequest notification){
 
         executor.execute(() -> googleSheetService.processCheckNotification(notification));
 

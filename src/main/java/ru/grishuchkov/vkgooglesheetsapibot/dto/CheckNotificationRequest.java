@@ -6,7 +6,7 @@ import ru.grishuchkov.vkgooglesheetsapibot.enums.TypeOfCheck;
 
 @Getter
 @Setter
-public class CheckNotification {
+public class CheckNotificationRequest {
     private String studentScreenName;
     private int numberOfWork;
     private TypeOfCheck type;

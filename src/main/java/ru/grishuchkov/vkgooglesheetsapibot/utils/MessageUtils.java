@@ -1,5 +1,6 @@
 package ru.grishuchkov.vkgooglesheetsapibot.utils;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -11,9 +12,14 @@ public class MessageUtils {
 
     private final ResourceBundle messagesResource;
 
-    private final String SUBMIT_HOMEWORK_COMMAND = messagesResource.getString("submit_homework_command");
-    private final String START_COMMAND = messagesResource.getString("homework_keyboard_command");
+    private String SUBMIT_HOMEWORK_COMMAND;
+    private String START_COMMAND;
 
+    @PostConstruct
+    private void init() {
+        SUBMIT_HOMEWORK_COMMAND = messagesResource.getString("submit_homework_command");
+        START_COMMAND = messagesResource.getString("homework_keyboard_command");
+    }
 
     public boolean isStarCommand(String messageText) {
         return messageText.equalsIgnoreCase(START_COMMAND);
