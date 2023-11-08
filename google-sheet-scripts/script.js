@@ -6,8 +6,9 @@ const CONFIGURATION_SHEET_NAME = "Конфигурация";
 
 const USER_LINKS_COLLUMN = 2; // Номер колонки с ссылками на рабочем листе
 const EXAMINER_COLLUMN = 5;
-const FIRST_HOMEWORK_COLLUMN = 6;
-const LAST_HOMEWORK_COLLUMN = 13;
+const FILE_URL_COLLUMN = 6;
+const FIRST_HOMEWORK_COLLUMN = 7;
+const LAST_HOMEWORK_COLLUMN = 14;
 const MAX_NUMBER_OF_HOMEWORK = 8;
 
 var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -16,6 +17,11 @@ var configurationSheet = ss.getSheetByName(CONFIGURATION_SHEET_NAME);
 const EXAMINER_NAME_COLLUMN = 3;
 const CHAT_ID_COLLUMN = 4;
 const CONFIRM_TOGGLE_COLLUMN = 5;
+
+
+const BAD_STATUS_CODE = 400;
+const CONFLICT_STATUS_CODE = 409;
+const OK_STATUS_CODE = 200;
 
 var activeSheet = ss.getSheetByName(sheetName);
 var activeCell = activeSheet.getActiveCell();
@@ -33,7 +39,7 @@ function doPost(request) {
             return addHomework(request);
     }
 
-    return ContentService.createTextOutput(JSON.stringify({statusCode: 500}))
+    return ContentService.createTextOutput(JSON.stringify({statusCode: BAD_STATUS_CODE}))
         .setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -46,11 +52,16 @@ function addHomework(request) {
     var userRow = findUserRowBySceenName(userScreenName);
 
     if (numberOfHomework < 1 || numberOfHomework > MAX_NUMBER_OF_HOMEWORK) {
-        return ContentService.createTextOutput(JSON.stringify({statusCode: 500}))
+        return ContentService.createTextOutput(JSON.stringify({statusCode: BAD_STATUS_CODE}))
             .setMimeType(ContentService.MimeType.JSON);
     }
     if (userRow < 1) {
-        return ContentService.createTextOutput(JSON.stringify({statusCode: 500}))
+        return ContentService.createTextOutput(JSON.stringify({statusCode: BAD_STATUS_CODE}))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (activeSheet.getRange(userRow, FIRST_HOMEWORK_COLLUMN - 1 + numberOfHomework).getValue() === "-") {
+        return ContentService.createTextOutput(JSON.stringify({statusCode: CONFLICT_STATUS_CODE}))
             .setMimeType(ContentService.MimeType.JSON);
     }
 
@@ -58,13 +69,15 @@ function addHomework(request) {
 
     var studentName = activeSheet.getRange(userRow, USER_LINKS_COLLUMN).getValue();
     var examinerName = activeSheet.getRange(userRow, EXAMINER_COLLUMN).getValue();
+    var fileUrl = activeSheet.getRange(userRow, FILE_URL_COLLUMN).getValue();
 
     var chatId = getTelegramChatIdByExaminer(examinerName);
 
     var data = {
-        'statusCode': 200,
-        'numberOfWork': numberOfHomework,
+        'statusCode': OK_STATUS_CODE,
         'telegramChatId': chatId,
+        'numberOfWork': numberOfHomework,
+        'studentFileUrl': fileUrl,
         'studentName': studentName
     };
 
@@ -127,15 +140,15 @@ function returnScreenNameByActiveRow() {
 function homeworkCheckProcess() {
 
     //проверка на границы окна работы и рабочего листа
-    if ((actualSheetName == activeSheet.getName()) && (activeColumn >= FIRST_HOMEWORK_COLLUMN && activeColumn <= LAST_HOMEWORK_COLLUMN)) {
+    if ((actualSheetName === activeSheet.getName()) && (activeColumn >= FIRST_HOMEWORK_COLLUMN && activeColumn <= LAST_HOMEWORK_COLLUMN)) {
 
         let userScreenName = returnScreenNameByActiveRow();
         let numberOfHomework = activeColumn - FIRST_HOMEWORK_COLLUMN + 1;
 
-        if ((activeCell.getValue() == "+" || activeCell.getValue() == "+-" || activeCell.getValue() == "-+") && colorOfCell != "#ffffff") {
+        if ((activeCell.getValue() === "+" || activeCell.getValue() === "+-" || activeCell.getValue() === "-+") && colorOfCell !== "#ffffff") {
             sendCheckNotification(userScreenName, numberOfHomework)
         }
-        if (typeof (activeCell.getValue()) == "number" && colorOfCell != "#ffffff") {
+        if (typeof (activeCell.getValue()) == "number" && colorOfCell !== "#ffffff") {
             var score = parseInt(activeCell.getValue(), 10);
             sendCheckNotification(userScreenName, numberOfHomework, score)
         }

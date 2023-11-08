@@ -148,8 +148,9 @@ public class VkCallbackService implements CallbackService {
     private String prepareMessageTextFromGoogleResponse(GoogleResponse response) {
         String studentName = response.getStudentName();
         String numberOfWork = response.getNumberOfWork();
+        String fileUrl = response.getStudentFileUrl();
 
-        return messageUtils.prepareTelegramNotificationMessage(studentName, numberOfWork);
+        return messageUtils.prepareTelegramNotificationMessage(studentName, numberOfWork, fileUrl);
     }
 
     private void processMessageEvent(JsonNode jsonNode) {

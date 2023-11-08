@@ -39,9 +39,9 @@ public class MessageUtils {
         return Integer.parseInt(messageText.split("№")[1]);
     }
 
-    public String prepareTelegramNotificationMessage(String studentName, String numberOfWork) {
+    public String prepareTelegramNotificationMessage(String studentName, String numberOfWork, String fileUrl) {
         String messageTemplate = messagesResource.getString("telegram_notification_message");
 
-        return String.format(messageTemplate, studentName, numberOfWork);
+        return String.format(messageTemplate, studentName, numberOfWork, fileUrl);
     }
 }

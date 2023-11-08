@@ -11,6 +11,7 @@ public class GoogleResponse {
     private String telegramChatId;
     private String studentName;
     private String numberOfWork;
+    private String studentFileUrl;
 
     public boolean hasValidStatusCode(){
         return statusCode == HttpStatus.SC_OK;
