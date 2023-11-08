@@ -2,6 +2,7 @@ package ru.grishuchkov.vkgooglesheetsapibot.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vk.api.sdk.objects.messages.Keyboard;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
@@ -33,9 +34,18 @@ public class VkCallbackService implements CallbackService {
     private final MessageUtils messageUtils;
     private final CallbackRequestMapper callbackRequestMapper;
 
-    private final String HOMEWORK_ATTEMPT_TEXT = messagesResource.getString("homework_attempt_to_send");
-    private final String FAIL_MESSAGE = messagesResource.getString("homework_sending_error");
-    private final String SUCCESS_MESSAGE = messagesResource.getString("homework_successfully_sent");
+    private String HOMEWORK_ATTEMPT_TEXT;
+    private String FAIL_TEXT;
+    private String SUCCESS_TEXT;
+    private String DEADLINE_EXPIRED_TEXT;
+
+    @PostConstruct
+    private void init() {
+        HOMEWORK_ATTEMPT_TEXT = messagesResource.getString("homework_attempt_to_send");
+        FAIL_TEXT = messagesResource.getString("homework_sending_error");
+        SUCCESS_TEXT = messagesResource.getString("homework_successfully_sent");
+        DEADLINE_EXPIRED_TEXT = messagesResource.getString("homework_deadline_expired");
+    }
 
     @Override
     public String getConfirmationCode(JsonNode requestJson) {
@@ -85,18 +95,24 @@ public class VkCallbackService implements CallbackService {
     }
 
     private void processSubmitHomeworkCommand(VkMessage message) {
+        Homework homework = prepareHomeworkFromMessage(message);
         sendMessageToUser(message, HOMEWORK_ATTEMPT_TEXT);
 
-        Homework homework = prepareHomeworkFromMessage(message);
         GoogleResponse googleResponse = googleSheetService.sendHomework(homework);
 
-        if (!googleResponse.hasValidStatusCode()) {
-            sendMessageToUser(message, FAIL_MESSAGE);
+        if (googleResponse.hasBadStatusCode()) {
             log.error("Google returned bad status code at sendHomework()");
+            sendMessageToUser(message, FAIL_TEXT);
             return;
         }
 
-        sendMessageToUser(message, SUCCESS_MESSAGE);
+        if (googleResponse.hasConflictStatusCode()) {
+            log.info("Deadline expired");
+            sendMessageToUser(message, DEADLINE_EXPIRED_TEXT);
+            return;
+        }
+
+        sendMessageToUser(message, SUCCESS_TEXT);
 
         if (googleResponse.hasTelegramChatId()) {
             prepareAndSendTelegramNotification(googleResponse);

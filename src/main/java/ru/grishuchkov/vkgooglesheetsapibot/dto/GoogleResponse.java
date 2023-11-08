@@ -16,6 +16,14 @@ public class GoogleResponse {
         return statusCode == HttpStatus.SC_OK;
     }
 
+    public boolean hasBadStatusCode(){
+        return statusCode == HttpStatus.SC_BAD_REQUEST;
+    }
+
+    public boolean hasConflictStatusCode(){
+        return statusCode == HttpStatus.SC_CONFLICT;
+    }
+
     public boolean hasTelegramChatId(){
         return !telegramChatId.isEmpty();
     }
