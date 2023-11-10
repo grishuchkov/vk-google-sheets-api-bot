@@ -1,7 +1,7 @@
 version: '3'
 services:
   google-sheet-bot:
-    image: grishuchkov/google-sheet-bot:v2
+    image: grishuchkov/google-sheet-bot:v3
     container_name: google-sheet-vk-bot
     ports:
       - 8080:8080
