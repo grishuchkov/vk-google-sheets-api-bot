@@ -12,6 +12,7 @@ import com.vk.api.sdk.objects.users.responses.GetResponse;
 import com.vk.api.sdk.queries.messages.MessagesSendMessageEventAnswerQuery;
 import com.vk.api.sdk.queries.messages.MessagesSendQuery;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.grishuchkov.vkgooglesheetsapibot.dto.VkMessage;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 @Service
+@Log4j
 public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.VkApiClient {
 
     @Value("${vk.api.token}")
@@ -100,6 +102,7 @@ public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.ifcs
         GetCallbackConfirmationCodeResponse response = vk.groups()
                 .getCallbackConfirmationCode(new GroupActor(groupId, token), groupId).execute();
 
+        log.debug("getConfirmationCode() in vkClient");
         return response.getCode();
     }
 

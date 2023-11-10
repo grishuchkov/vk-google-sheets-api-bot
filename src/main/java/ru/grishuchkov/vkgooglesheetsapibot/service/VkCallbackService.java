@@ -51,6 +51,7 @@ public class VkCallbackService implements CallbackService {
     public String getConfirmationCode(JsonNode requestJson) {
         int groupId = requestJson.get("group_id").asInt();
 
+        log.debug("getConfirmationCode() in service");
         return vkClient.getConfirmationCode(groupId);
     }
 
@@ -76,10 +77,12 @@ public class VkCallbackService implements CallbackService {
                 .build();
 
         if (messageUtils.isStarCommand(message.getText())) {
+            log.debug("Bot's starting command was called");
             prepareAndSendResponseToStartCommand(message);
         }
 
         if (messageUtils.isSubmitHomeworkCommand(message.getText())) {
+            log.debug("Bot's submit homework command was called");
             processSubmitHomeworkCommand(message);
         }
     }
@@ -107,7 +110,7 @@ public class VkCallbackService implements CallbackService {
         }
 
         if (googleResponse.hasConflictStatusCode()) {
-            log.info("Deadline expired");
+            log.debug("Deadline expired");
             sendMessageToUser(message, DEADLINE_EXPIRED_TEXT);
             return;
         }

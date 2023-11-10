@@ -1,9 +1,7 @@
 package ru.grishuchkov.vkgooglesheetsapibot.dto;
 
 import com.vk.api.sdk.objects.messages.Keyboard;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter

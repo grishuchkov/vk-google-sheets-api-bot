@@ -48,7 +48,7 @@ public class GoogleSheetsClient implements GoogleSheetsApiClient {
         ResponseEntity<GoogleResponse> redirectedResponse = restTemplate.getForEntity(redirectUrl, GoogleResponse.class);
 
         GoogleResponse body = redirectedResponse.getBody();
-        log.info("sendHomework method was executed successfully");
+        log.debug("sendHomework method was executed successfully");
         return body;
     }
 }

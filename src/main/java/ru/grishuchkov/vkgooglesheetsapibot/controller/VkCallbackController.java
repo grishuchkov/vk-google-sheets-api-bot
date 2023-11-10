@@ -1,6 +1,7 @@
 package ru.grishuchkov.vkgooglesheetsapibot.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
@@ -13,6 +14,7 @@ import ru.grishuchkov.vkgooglesheetsapibot.enums.CallbackType;
 import ru.grishuchkov.vkgooglesheetsapibot.service.ifcs.CallbackService;
 
 @RestController
+@Log4j
 public class VkCallbackController {
     private final CallbackService callbackService;
     private final ThreadPoolTaskExecutor executor;
@@ -29,6 +31,8 @@ public class VkCallbackController {
 
         if (type.equals(CallbackType.CONFIRMATION.getType())) {
             String confirmationCode = callbackService.getConfirmationCode(callbackJson);
+
+            log.debug("returned confirmationCode");
             return new ResponseEntity<>(confirmationCode, HttpStatusCode.valueOf(200));
         }
 

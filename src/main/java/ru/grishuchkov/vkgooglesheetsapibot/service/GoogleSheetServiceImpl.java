@@ -2,7 +2,7 @@ package ru.grishuchkov.vkgooglesheetsapibot.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.grishuchkov.vkgooglesheetsapibot.client.ifcs.GoogleSheetsApiClient;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 @Service
-@Log4j2
+@Log4j
 @RequiredArgsConstructor
 public class GoogleSheetServiceImpl implements GoogleSheetService {
 
