@@ -6,6 +6,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
 public class VkMessage {
     private Integer groupId;
     private Integer userId;

@@ -8,3 +8,6 @@ telegram.api:
 
 google.sheet.api:
   url: ${GOOGLE_SHEET_API_URL}
+
+homeworks:
+  count: ${COUNT_OF_HOMEWORKS}

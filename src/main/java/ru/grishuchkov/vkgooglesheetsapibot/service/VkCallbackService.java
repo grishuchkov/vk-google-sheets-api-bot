@@ -131,7 +131,7 @@ public class VkCallbackService implements CallbackService {
         Integer userId = message.getUserId();
         Integer groupId = message.getGroupId();
 
-        Integer homeworkNumber = messageUtils.extractHomeworkNumber(message.getText());
+        int homeworkNumber = messageUtils.extractHomeworkNumber(message.getText());
         String userScreenName = vkClient.getUserScreenNameByUserId(groupId, userId);
 
         return Homework.builder()

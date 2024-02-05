@@ -40,7 +40,6 @@ public class GoogleSheetServiceImpl implements GoogleSheetService {
 
     @Override
     public void processCheckNotification(CheckNotificationRequest notification) {
-
         Optional<String> text = prepareNotificationText(notification);
 
         if (text.isEmpty()) {
