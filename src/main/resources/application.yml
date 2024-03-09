@@ -2,6 +2,9 @@ vk.api:
   token: ${VK_API_TOKEN}
   groupId: ${COURSE_GROUP_ID}
 
+vk.main.api:
+  token: ${VK_API_TOKEN}
+
 telegram.api:
   token: ${TELEGRAM_API_TOKEN}
   botName: ura_ua_sdelal_bot

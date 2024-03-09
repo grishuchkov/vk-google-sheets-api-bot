@@ -3,12 +3,14 @@ package ru.grishuchkov.vkgooglesheetsapibot.client;
 import com.vk.api.sdk.client.AbstractQueryBuilder;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
+import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.objects.groups.responses.GetCallbackConfirmationCodeResponse;
 import com.vk.api.sdk.objects.messages.Keyboard;
 import com.vk.api.sdk.objects.users.Fields;
 import com.vk.api.sdk.objects.users.responses.GetResponse;
+import com.vk.api.sdk.queries.groups.GroupsApproveRequestQuery;
 import com.vk.api.sdk.queries.messages.MessagesSendMessageEventAnswerQuery;
 import com.vk.api.sdk.queries.messages.MessagesSendQuery;
 import lombok.SneakyThrows;
@@ -35,7 +37,7 @@ public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.ifcs
         random = new Random();
     }
 
-    private void executeRequest(AbstractQueryBuilder<?, ?> request){
+    private void executeRequest(AbstractQueryBuilder<?, ?> request) {
         try {
             Object execute = request.execute();
         } catch (ApiException | ClientException e) {
@@ -71,7 +73,7 @@ public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.ifcs
     public void sendMessage(VkMessage message) {
         Keyboard keyboardObject = new Keyboard();
 
-        if(message.hasKeyboard()){
+        if (message.hasKeyboard()) {
             keyboardObject = message.getKeyboard();
         }
 
@@ -116,7 +118,7 @@ public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.ifcs
                 .execute();
 
 
-        if(response.isEmpty()){
+        if (response.isEmpty()) {
             throw new RuntimeException("getUserScreenNameByUserId failed");
         }
 
@@ -131,10 +133,20 @@ public class VkClient implements ru.grishuchkov.vkgooglesheetsapibot.client.ifcs
                 .userIds(screenName)
                 .execute();
 
-        if(response.isEmpty()){
+        if (response.isEmpty()) {
             throw new RuntimeException("getUserIdByScreenName failed");
         }
 
         return response.get(0).getId();
+    }
+
+
+    @Override
+    @SneakyThrows
+    public void approveRequest(int groupId, String token, int userId) {
+        GroupsApproveRequestQuery requestQuery = vk.groups().approveRequest(
+                new UserActor(groupId, token), groupId, userId
+        );
+        requestQuery.execute();
     }
 }

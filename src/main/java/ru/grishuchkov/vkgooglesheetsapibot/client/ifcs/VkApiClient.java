@@ -18,4 +18,6 @@ public interface VkApiClient {
     Integer getUserIdByScreenName(int groupId, String screenName);
 
     void sendMessage(VkMessage message);
+
+    void approveRequest(int groupId, String token, int userId);
 }
